@@ -1,0 +1,20 @@
+cabal-version: >= 1.2
+name: cafebabe
+version: 0.0
+build-type: Simple
+license: MIT
+copyright: Ivan Veselov, 2010
+author: Ivan Veselov <veselov@gmail.com>
+maintainer: Ivan Veselov <veselov@gmail.com>
+stability: experimental
+homepage: http://github.com/sphynx/cafebabe
+bug-reports: http://github.com/sphynx/cafebabe/issues
+synopsis: Java class file parser
+tested-with: GHC
+
+Executable cafebabe
+    build-depends: binary == 0.5.*
+                 , base == 4.*
+                 , mtl == 1.1.*
+                 , bytestring == 0.9.*
+    main-is: cafebabe.hs
