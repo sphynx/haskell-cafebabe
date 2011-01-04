@@ -40,6 +40,12 @@ import qualified Data.ByteString.Lazy     as L
     }
 -}
 
+getWord16 :: Get Word16
+getWord16 = getWord16be
+
+getWord32 :: Get Word32
+getWord32 = getWord32be
+
 data JavaClass = JavaClass {
     classMinorVersion :: Word16
   , classMajorVersion :: MajorVersion
@@ -48,20 +54,22 @@ data JavaClass = JavaClass {
 
 getJavaClass :: Get JavaClass
 getJavaClass = do
-  getClassMagic
+  checkClassMagic
   minorVersion   <- getMinorVersion
   majorVersion   <- getMajorVersion
   constPoolCount <- getConstantsPoolCount
   return $ JavaClass minorVersion majorVersion constPoolCount
 
-getClassMagic = do
-  magic <- getWord32be
+checkClassMagic :: Get ()
+checkClassMagic = do
+  magic <- getWord32
   if magic /= 0xCAFEBABE then
     fail "Invalid magic number for Java class"
     else
-    return magic
+    return ()
 
-getMinorVersion = getWord16be >>= return
+getMinorVersion :: Get Word16
+getMinorVersion = getWord16 >>= return
 
 {-
 J2SE 7.0 = 51 (0x33 hex),
@@ -74,7 +82,8 @@ JDK 1.1 = 45 (0x2D hex).
 -}
 
 data MajorVersion
-  = J2SE_6_0
+  = J2SE_7_0
+  | J2SE_6_0
   | J2SE_5_0
   | JDK_1_4
   | JDK_1_3
@@ -82,18 +91,51 @@ data MajorVersion
   | JDK_1_1
   deriving (Eq, Show)
 
+getMajorVersion :: Get MajorVersion
 getMajorVersion = do
     version <- getWord16be
-    return $ cast version
-    where cast 51 = J2SE_7_0
-          cast 50 = J2SE_6_0
-          cast 49 = J2SE_5_0
-          cast 48 = JDK_1_4
-          cast 47 = JDK_1_3
-          cast 46 = JDK_1_2
-          cast 45 = JDK_1_1
+    return $ convert version
+    where convert 51 = J2SE_7_0
+          convert 50 = J2SE_6_0
+          convert 49 = J2SE_5_0
+          convert 48 = JDK_1_4
+          convert 47 = JDK_1_3
+          convert 46 = JDK_1_2
+          convert 45 = JDK_1_1
 
-getConstantsPoolCount = getWord16be >>= return
+getConstantsPoolCount :: Get Word16
+getConstantsPoolCount = getWord16 >>= return
+
+getConstantsPool = undefined
+
+data Tag
+  = TAG_STRING
+  | TAG_INTEGER
+  | TAG_FLOAT
+  | TAG_LONG
+  | TAG_DOUBLE
+  | TAG_CLASS_REF
+  | TAG_STRING_REF
+  | TAG_FIELD_REF
+  | TAG_METHOD_REF
+  | TAG_INTERFACE_REF
+  | TAG_NAME_AND_TYPE
+
+getTag :: Get Tag
+getTag = do
+  tag <- getWord8
+  return $ convert tag
+  where convert 1 = TAG_STRING
+        convert 3 = TAG_INTEGER
+        convert 4 = TAG_FLOAT
+        convert 5 = TAG_LONG
+        convert 6 = TAG_DOUBLE
+        convert 7 = TAG_CLASS_REF
+        convert 8 = TAG_STRING_REF
+        convert 9 = TAG_FIELD_REF
+        convert 10 = TAG_METHOD_REF
+        convert 11 = TAG_INTERFACE_REF
+        convert 12 = TAG_NAME_AND_TYPE
 
 parse :: B.ByteString -> JavaClass
 parse b = runGet getJavaClass $ L.fromChunks [b]
