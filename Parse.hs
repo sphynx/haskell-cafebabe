@@ -1,3 +1,14 @@
+{-
+Java class file parser.
+
+Implementation is based on the format specification from
+"Tim Lindholm, Frank Yellin (1999). The Java Virtual Machine Specification (Second Edition ed.). Prentice Hall."
+
+which is available for free here:
+http://java.sun.com/docs/books/jvms/second_edition/html/ClassFile.doc.html
+
+-}
+
 module Parse where
 
 import Data.Binary
