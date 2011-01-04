@@ -7,8 +7,8 @@ copyright: Ivan Veselov, 2010
 author: Ivan Veselov <veselov@gmail.com>
 maintainer: Ivan Veselov <veselov@gmail.com>
 stability: experimental
-homepage: http://github.com/sphynx/cafebabe
-bug-reports: http://github.com/sphynx/cafebabe/issues
+homepage: http://github.com/sphynx/haskell-cafebabe
+bug-reports: http://github.com/sphynx/haskell-cafebabe/issues
 synopsis: Java class file parser
 tested-with: GHC
 
